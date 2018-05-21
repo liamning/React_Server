@@ -1,0 +1,29 @@
+﻿
+<div ng-controller="SampleCtrl as ctrl">
+
+    <div class="row border-bottom ng-scope top-button-panel">
+
+        <!--<div class="pull-left nav-path font-bold">
+            Sample
+        </div>-->
+
+
+        <ul class="pull-left nav-path font-bold">
+            <li ng-repeat="item in viewsList track by $index" ng-class="{active: templateURL['url']==item.url }"><a ng-click="templateURL['url'] = item.url; templateURL.pageNo=$index;">{{item.name}}</a></li> 
+        </ul>
+
+
+        <!--<ul class="pull-left nav-path font-bold" ng-repeat="item in viewsList">
+            <li ng-class="{active: templateURL['url']=='views/sampleHeader.html'}"><a ng-click="templateURL['url'] = 'views/sampleHeader.html'">Sample</a></li>
+            <li ng-class="{active: templateURL['url']=='views/sampleChild.html'}"><a ng-click="templateURL['url'] = 'views/sampleChild.html'">Edit Child</a></li>
+        </ul>-->
+
+        <div class="btn-group pull-right m-t-sm" ng-show="templateURL.pageNo==0">
+            <a class="btn btn-danger" ng-click="delete()"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+            <button class="btn btn-primary" ng-click="save()"><i class="fa fa-save"></i>&nbsp;&nbsp;Save</button>
+        </div>
+    </div>
+
+    <div ng-include="templateURL['url']"></div>
+
+</div>

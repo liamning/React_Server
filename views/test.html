@@ -1,0 +1,16 @@
+﻿
+
+
+<div ng-controller="testCtrl as ctrl" ng-cloak="" class="virtualRepeatdemoDeferredLoading" ng-app="MyApp">
+    <md-content layout="column">
+
+        <md-virtual-repeat-container id="vertical-container">
+            <div md-virtual-repeat="item in ctrl.dynamicItems" md-on-demand="" class="repeated-item" flex="">
+                {{item}}
+            </div>
+        </md-virtual-repeat-container>
+    </md-content>
+
+</div>
+
+ 
