@@ -7,6 +7,7 @@ public class ClientInfo
 	public string Phone { get; set; }
 	public string Fax { get; set; }
 	public string ContactPerson { get; set; }
+	public DateTime? RegistrationDate { get; set; }
 	public class FieldName
 	{
 		public const string Code = "Code";
@@ -15,5 +16,6 @@ public class ClientInfo
 		public const string Phone = "Phone";
 		public const string Fax = "Fax";
 		public const string ContactPerson = "ContactPerson";
+		public const string RegistrationDate = "RegistrationDate";
 	}
 }
