@@ -16,7 +16,7 @@ public class Client
     public List<GeneralCodeDesc> GetCodeDescList(string input)
     {
         db.Open();
-        String query = "select top 10 Code, Name [Desc] from Client where (@Code = '' or Code like '%' + @Code + '%') order by Code";
+        String query = "select top 10 Code, Code [Desc] from Client where (@Code = '' or Code like '%' + @Code + '%') order by Code";
         var obj = (List<GeneralCodeDesc>)db.Query<GeneralCodeDesc>(query, new { Code = input });
         db.Close();
         return obj;

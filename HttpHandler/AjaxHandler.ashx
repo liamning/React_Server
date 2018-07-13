@@ -58,6 +58,17 @@ public class AjaxHandler : IHttpHandler, IRequiresSessionState
                     string Code = request["Code"];
                     result = Newtonsoft.Json.JsonConvert.SerializeObject(new Client().Get(Code), IsoDateTimeConverter);
                     break;
+                case "saveHeader":
+                    string HeaderInfoString = request["HeaderInfo"];
+                    var HeaderInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<HeaderInfo>(HeaderInfoString, IsoDateTimeConverter);
+                    HeaderInfo.CreateUser = userID;
+                    new Header().Save(HeaderInfo);
+                    result = "{\"message\":\"Done.\"}";
+                    break;
+                case "getHeader":
+                    Code = request["Code"];
+                    result = Newtonsoft.Json.JsonConvert.SerializeObject(new Header().Get(Code), IsoDateTimeConverter);
+                    break;
                     
                 case "getGeneralMasterList":
                     string[] masterNames = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(request["categories"]);

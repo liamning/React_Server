@@ -21,9 +21,9 @@ public class GeneralMaster
         {
             switch (masterName)
             {
-                case "Relationship":
-                    dict.Add(masterName, this.getGeneralMaster(masterName));
-                    break;
+                //case "Relationship":
+                //    dict.Add(masterName, this.getGeneralMaster(masterName));
+                //    break;
                 //case "Role":
                 //    dict.Add(masterName, this.GetRoleList());
                 //    break;
@@ -70,7 +70,11 @@ public class GeneralMaster
             case "Sample":
                 return this.RefreshSampleList(input);
             case "Client":
-                return new Client().GetCodeDescList(input); 
+                return new Client().GetCodeDescList(input);
+            case "Header":
+                return new Header().GetCodeDescList(input); 
+            default:
+                return this.getGeneralMaster(tableName, input);
         }
 
         return null;
@@ -89,19 +93,21 @@ public class GeneralMaster
         return obj;
     }
 
-    private List<GeneralCodeDesc> getGeneralMaster(string category)
+    private List<GeneralCodeDesc> getGeneralMaster(string category, string desc)
     {
         this.db.Open();
 
         try
         {
             string query = @" 
-                SELECT [Code] Code
-                      ,[EngDesc] [Desc]
-                  FROM [dbo].[GeneralMaster]
-                  where Category = @Category order by Seq
+SELECT [Code] Code
+,[EngDesc] [Desc]
+FROM [dbo].[GeneralMaster]
+where Category = @Category 
+and (@desc = '' or EngDesc like '%' + @desc + '%' )
+order by Seq
                 ";
-            List<GeneralCodeDesc> result = (List<GeneralCodeDesc>)this.db.Query<GeneralCodeDesc>(query, new { category = category });
+            List<GeneralCodeDesc> result = (List<GeneralCodeDesc>)this.db.Query<GeneralCodeDesc>(query, new { category = category, desc = desc });
             return result;
         }
         catch
