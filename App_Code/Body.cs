@@ -130,7 +130,7 @@ order by Line";
 		+ ",[SampleTime] " 
 		+") "
 		+ "VALUES ( @HeaderCode "
-		+ ",@Line " 
+        + ",(select ISNULL(max(Line),0) + 1 from [dbo].[Body] where HeaderCode = @HeaderCode) " 
 		+ ",@BodyDateTime " 
 		+ ",@Combo1 " 
 		+ ",@CreateUser " 
