@@ -10,15 +10,16 @@ using Dapper;
 public class UserProfile
 {
 	#region Standar Function
-    SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlServerConnString"].ConnectionString);  
-     
+    SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlServerConnString"].ConnectionString);
 
-    public List<string> GetStaffNoList(string StaffNo)
+
+    public List<GeneralCodeDesc> GetCodeDescList(string StaffNo)
     { 
         db.Open();
-        String query = "select top 10 StaffNo from UserProfile where (@StaffNo = '' or StaffNo like '%' + @StaffNo + '%') order by StaffNo";
-        var obj = (List<string>)db.Query<string>(query, new { StaffNo = StaffNo });
+        String query = "select top 10 StaffNo Code, StaffNo [Desc] from UserProfile where (@StaffNo = '' or StaffNo like '%' + @StaffNo + '%') order by StaffNo";
+        var obj = (List<GeneralCodeDesc>)db.Query<GeneralCodeDesc>(query, new { StaffNo = StaffNo });
         db.Close();
+
         return obj;
     }
 
@@ -148,5 +149,19 @@ public class UserProfile
         db.Close();
     }
 	#endregion 
+
+    
+    public void ChangePassword(string staffNo, string originPassword, string newPassword)
+    {
+        db.Open();
+
+        string query = " UPDATE [dbo].[UserProfile] SET  "
+        + " [Password] = @NewPassword "
+        + " where StaffNo = @StaffNo and Password = @OriginPassword ";
+
+        db.Execute(query, new { StaffNo = staffNo, OriginPassword = originPassword, NewPassword = newPassword });
+        db.Close();
+    }
+
 
 }

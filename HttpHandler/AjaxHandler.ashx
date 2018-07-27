@@ -65,16 +65,42 @@ public class AjaxHandler : IHttpHandler, IRequiresSessionState
                     new Header().Save(HeaderInfo);
                     result = "{\"message\":\"Done.\"}";
                     break;
+                case "getUser":
+                    string StaffNo = request["StaffNo"];
+                    result = Newtonsoft.Json.JsonConvert.SerializeObject(new UserProfile().Get(StaffNo), IsoDateTimeConverter);
+                    break;
+                case "saveUser":
+                    var UserProfileInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<UserProfileInfo>(request["UserProfileInfo"]);
+                    new UserProfile().Save(UserProfileInfo);
+                    result = "{\"message\":\"Done.\"}";
+                    break;
+                case "changePassword":
+                    var originPassword = request["OriginPassword"];
+                    var newPassword = request["NewPassword"];
+                    new UserProfile().ChangePassword(userID, originPassword, newPassword);
+                    result = "{\"message\":\"Done.\"}";
+                    break;
                 case "getHeader":
                     Code = request["Code"];
                     result = Newtonsoft.Json.JsonConvert.SerializeObject(new Header().Get(Code), IsoDateTimeConverter);
                     break;
-                    
+
                 case "getGeneralMasterList":
                     string[] masterNames = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(request["categories"]);
                     result = Newtonsoft.Json.JsonConvert.SerializeObject(new GeneralMaster().GetGeneralMasterList(masterNames));
-                    break; 
+                    break;
 
+                case "saveGeneralMaster":
+                    List<GeneralMasterInfo> GeneralMasterList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GeneralMasterInfo>>(request["GeneralMasterList"]);
+                    new GeneralMaster().Save(GeneralMasterList);
+                    result = "{\"message\":\"Done.\"}";
+                    break;
+
+                case "getGeneralMaster":
+                    string category = request["category"];
+                    result = Newtonsoft.Json.JsonConvert.SerializeObject(new GeneralMaster().getGeneralMaster(category));
+                    break; 
+                    
                 case "refreshList":
                     string table = request["Table"];
                     string input = request["Input"];

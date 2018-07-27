@@ -12,6 +12,8 @@ using Dapper;
 public class GeneralMaster
 {
     SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlServerConnString"].ConnectionString);
+    SqlTransaction transaction;
+    bool isSubTable = false;
 
     public Dictionary<string, List<GeneralCodeDesc>> GetGeneralMasterList(string[] masterNames)
     {
@@ -71,8 +73,12 @@ public class GeneralMaster
                 return this.RefreshSampleList(input);
             case "Client":
                 return new Client().GetCodeDescList(input);
+            case "UserProfile":
+                return new UserProfile().GetCodeDescList(input);
             case "Header":
-                return new Header().GetCodeDescList(input); 
+                return new Header().GetCodeDescList(input);
+            case "GeneralMaster":
+                return this.getGeneralMasterCategory(tableName, input); 
             default:
                 return this.getGeneralMaster(tableName, input);
         }
@@ -92,6 +98,32 @@ public class GeneralMaster
         db.Close();
         return obj;
     }
+
+    private List<GeneralCodeDesc> getGeneralMasterCategory(string category, string desc)
+    {
+        this.db.Open();
+
+        try
+        {
+            string query = @" 
+SELECT  distinct [Category] Code
+,[Category] Code
+FROM [dbo].[GeneralMaster]
+where (@desc = '' or Category like '%' + @desc + '%' ) 
+                ";
+            List<GeneralCodeDesc> result = (List<GeneralCodeDesc>)this.db.Query<GeneralCodeDesc>(query, new { category = category, desc = desc });
+            return result;
+        }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            this.db.Close();
+        }
+    }
+
 
     private List<GeneralCodeDesc> getGeneralMaster(string category, string desc)
     {
@@ -119,6 +151,130 @@ order by Seq
             this.db.Close();
         }
     }
+
+
+    public List<GeneralMasterInfo> getGeneralMaster(string category)
+    {
+        this.db.Open();
+
+        try
+        {
+            string query = @" 
+SELECT
+* 
+FROM [dbo].[GeneralMaster]
+where Category = @Category  
+order by Seq
+";
+            List<GeneralMasterInfo> result = (List<GeneralMasterInfo>)this.db.Query<GeneralMasterInfo>(query, new { category = category });
+            return result;
+        }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            this.db.Close();
+        }
+    }
+
+    public bool IsExisted(GeneralMasterInfo info)
+    {
+        if (!this.isSubTable)
+            db.Open();
+
+        String query = "select count(*)  from GeneralMaster "
+        + " where Category = @Category and Seq = @Seq ";
+        var obj = (List<int>)db.Query<int>(query, info, this.transaction);
+
+
+        if (!this.isSubTable)
+            db.Close();
+
+        return obj[0] > 0;
+    }
+
+    public void Save(List<GeneralMasterInfo> list)
+    {
+        foreach (var info in list)
+        {
+            if (this.IsExisted(info))
+                this.Update(info);
+            else
+                this.Insert(info);
+        }
+        
+    }
+
+    public void Update(GeneralMasterInfo info)
+    {
+
+        if (!this.isSubTable)
+            db.Open();
+
+        string query = " UPDATE [dbo].[GeneralMaster] SET  "
+        + " [Category] = @Category "
+        + ", [CategoryDesc] = @CategoryDesc "
+        + ", [Seq] = @Seq "
+        + ", [Code] = @Code "
+        + ", [EngDesc] = @EngDesc "
+        + ", [ChiDesc] = @ChiDesc "
+        + ", [IsLocked] = @IsLocked "
+        + ", [CreateUser] = @CreateUser "
+        + ", [CreateDate] = @CreateDate "
+        + ", [LastModifiedUser] = @LastModifiedUser "
+        + ", [LastModifiedDate] = @LastModifiedDate "
+        + " where ID = @ID ";
+
+
+        db.Execute(query, info, this.transaction);
+
+
+        if (!this.isSubTable)
+            db.Close();
+    }
+
+    public void Insert(GeneralMasterInfo info)
+    {
+
+        if (!this.isSubTable)
+            db.Open();
+
+        string query = "INSERT INTO [dbo].[GeneralMaster] (  "
+        + " [Category] "
+        + ",[CategoryDesc] "
+        + ",[Seq] "
+        + ",[Code] "
+        + ",[EngDesc] "
+        + ",[ChiDesc] "
+        + ",[IsLocked] "
+        + ",[CreateUser] "
+        + ",[CreateDate] "
+        + ",[LastModifiedUser] "
+        + ",[LastModifiedDate] "
+        + ") "
+        + "VALUES (  "
+        + " @Category "
+        + ",@CategoryDesc "
+        + ",(select isnull(max(seq), 0) + 1 from [dbo].[GeneralMaster] where Category=@Category) "
+        + ",@Code "
+        + ",@EngDesc "
+        + ",@ChiDesc "
+        + ",@IsLocked "
+        + ",@CreateUser "
+        + ",@CreateDate "
+        + ",@LastModifiedUser "
+        + ",@LastModifiedDate "
+        + ") ";
+
+
+        db.Execute(query, info, this.transaction);
+
+        if (!this.isSubTable)
+            db.Close();
+    }
+
 
 //    private List<GeneralCodeDesc> getLocationList()
 //    {
